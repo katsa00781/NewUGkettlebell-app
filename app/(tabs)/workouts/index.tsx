@@ -1,129 +1,211 @@
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { ScrollView, View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useWorkouts } from '@/hooks/useWorkouts';
-import { format, isToday, parseISO } from 'date-fns';
-import { hu } from 'date-fns/locale';
+import { format } from 'date-fns';
 import { useMemo } from 'react';
-import type { Workout } from '@/lib/workouts';
+import type { Workout, WorkoutSection } from '@/lib/workouts';
+import type { Json } from '@/types/supabase';
 
-function WorkoutCard({ workout, isNext }: { workout: Workout; isNext: boolean }) {
-  const router = useRouter();
-  const sections = typeof workout.sections === 'string'
-    ? JSON.parse(workout.sections)
-    : workout.sections as unknown[];
+type WorkoutStatus = 'completed' | 'today' | 'upcoming';
 
-  const workoutDate = parseISO(workout.date);
-  const todayWorkout = isToday(workoutDate);
+function parseSections(sections: Json): WorkoutSection[] {
+  try {
+    const arr = typeof sections === 'string' ? JSON.parse(sections) : sections;
+    return Array.isArray(arr) ? (arr as WorkoutSection[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function getSectionNames(sections: Json): string {
+  return parseSections(sections)
+    .map(s => s.name)
+    .slice(0, 3)
+    .join(' / ');
+}
+
+function getTotalSets(sections: Json): number {
+  return parseSections(sections).reduce(
+    (acc, s) => acc + (s.exercises?.reduce((sum, ex) => sum + (ex.sets ?? 0), 0) ?? 0),
+    0
+  );
+}
+
+function extractTitleParts(title: string): { dayLabel: string | null; shortTitle: string } {
+  const match = title.match(/^([A-D]\s+nap)\s*[—\-–]\s*(.+)$/i);
+  if (match) return { dayLabel: match[1].trim(), shortTitle: match[2].trim() };
+  return { dayLabel: null, shortTitle: title };
+}
+
+function getDayLetter(title: string, index: number): string {
+  const match = title.match(/^([A-D])\s+nap/i);
+  if (match) return match[1].toUpperCase();
+  return ['A', 'B', 'C', 'D', 'E', 'F', 'G'][index % 7];
+}
+
+function getStatus(dateStr: string, todayStr: string): WorkoutStatus {
+  if (dateStr < todayStr) return 'completed';
+  if (dateStr === todayStr) return 'today';
+  return 'upcoming';
+}
+
+function HeroCard({ workout, onPress }: { workout: Workout; onPress: () => void }) {
+  const { dayLabel } = extractTitleParts(workout.title);
+  const sectionNames = getSectionNames(workout.sections);
+  const totalSets = getTotalSets(workout.sections);
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+  const isToday = workout.date === todayStr;
+
+  return (
+    <View
+      className="bg-slate-800 rounded-2xl p-4 mb-6"
+      style={{ borderWidth: 1.5, borderColor: 'rgba(249,115,22,0.4)' }}
+    >
+      <View className="flex-row items-center mb-2">
+        <View
+          className="rounded-md px-2 py-0.5 mr-2"
+          style={{ backgroundColor: '#f97316' }}
+        >
+          <Text className="text-white font-bold" style={{ fontSize: 11, letterSpacing: 0.5 }}>
+            {isToday ? 'MA' : 'Következő'}
+          </Text>
+        </View>
+        {dayLabel && (
+          <Text
+            className="text-slate-400 font-bold"
+            style={{ fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase' }}
+          >
+            {dayLabel}
+          </Text>
+        )}
+      </View>
+
+      <Text className="text-white font-bold mb-1" style={{ fontSize: 22, letterSpacing: -0.5 }}>
+        {workout.title}
+      </Text>
+
+      {sectionNames ? (
+        <Text className="text-slate-400 mb-3" style={{ fontSize: 13 }}>
+          {sectionNames}
+        </Text>
+      ) : null}
+
+      <View className="flex-row items-center mb-4" style={{ gap: 16 }}>
+        {workout.duration > 0 && (
+          <View className="flex-row items-center" style={{ gap: 5 }}>
+            <Ionicons name="time-outline" size={15} color="#64748b" />
+            <Text className="text-slate-300 text-sm">~{workout.duration} perc</Text>
+          </View>
+        )}
+        {totalSets > 0 && (
+          <View className="flex-row items-center" style={{ gap: 5 }}>
+            <Ionicons name="layers-outline" size={15} color="#64748b" />
+            <Text className="text-slate-300 text-sm">{totalSets} szett</Text>
+          </View>
+        )}
+      </View>
+
+      <TouchableOpacity
+        className="rounded-xl py-3 flex-row items-center justify-center"
+        style={{ backgroundColor: '#f97316', gap: 8 }}
+        onPress={onPress}
+        activeOpacity={0.85}
+      >
+        <Ionicons name="play" size={15} color="#fff" />
+        <Text className="text-white font-bold" style={{ fontSize: 15 }}>
+          Edzés indítása
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+function WeeklyRow({
+  workout,
+  status,
+  dayLetter,
+  onPress,
+}: {
+  workout: Workout;
+  status: WorkoutStatus;
+  dayLetter: string;
+  onPress: () => void;
+}) {
+  const { shortTitle } = extractTitleParts(workout.title);
+
+  const badgeBg =
+    status === 'completed' ? '#14532d'
+    : status === 'today' ? '#f97316'
+    : '#1e293b';
+
+  const statusText =
+    status === 'completed'
+      ? `Befejezve${workout.duration > 0 ? ` · ${workout.duration} perc` : ''}`
+      : status === 'today'
+      ? `Ma esedékes${workout.duration > 0 ? ` · ${workout.duration} perc` : ''}`
+      : `Várakozik${workout.duration > 0 ? ` · ${workout.duration} perc` : ''}`;
+
+  const statusColor =
+    status === 'completed' ? '#4ade80'
+    : status === 'today' ? '#f97316'
+    : '#64748b';
 
   return (
     <TouchableOpacity
-      className="bg-slate-800 rounded-2xl p-4 mb-3 mx-4"
-      style={isNext ? { borderWidth: 1, borderColor: 'rgba(249,115,22,0.35)' } : { borderWidth: 1, borderColor: '#1e2a3f' }}
-      onPress={() => router.push(`/(tabs)/workouts/${workout.id}`)}
+      className="bg-slate-800 rounded-2xl px-4 py-3 mb-2 flex-row items-center"
+      style={{ borderWidth: 1, borderColor: '#1e2a3f' }}
+      onPress={onPress}
       activeOpacity={0.8}
     >
-      {isNext && (
-        <View className="flex-row items-center mb-2">
-          <View
-            className="rounded-md px-2 py-0.5 mr-2"
-            style={{ backgroundColor: '#f97316' }}
-          >
-            <Text className="text-white font-bold" style={{ fontSize: 10.5, letterSpacing: 0.8, textTransform: 'uppercase' }}>
-              {todayWorkout ? 'Ma' : 'Következő'}
-            </Text>
-          </View>
+      <View
+        className="w-10 h-10 rounded-xl items-center justify-center mr-3"
+        style={{ backgroundColor: badgeBg }}
+      >
+        {status === 'completed' ? (
+          <Ionicons name="checkmark" size={20} color="#4ade80" />
+        ) : (
           <Text
-            className="text-slate-400 font-semibold"
-            style={{ fontSize: 11, letterSpacing: 0.8, textTransform: 'uppercase' }}
+            className="font-bold"
+            style={{ fontSize: 15, color: status === 'today' ? '#fff' : '#94a3b8' }}
           >
-            Soron következő edzés
+            {dayLetter}
           </Text>
-        </View>
-      )}
-      <View className="flex-row items-start justify-between">
-        <View className="flex-1">
-          <Text className="font-bold text-base text-white">
-            {workout.title}
-          </Text>
-          <Text className="text-slate-400 text-xs mt-1">
-            {format(workoutDate, 'yyyy. MMMM d.', { locale: hu })}
-          </Text>
-          <View className="flex-row mt-2 gap-2">
-            {workout.duration > 0 && (
-              <View
-                className="rounded-lg px-2 py-1"
-                style={{ backgroundColor: isNext ? 'rgba(249,115,22,0.14)' : '#1e293b', borderWidth: 1, borderColor: '#1e2a3f' }}
-              >
-                <Text
-                  className="text-xs"
-                  style={{ color: isNext ? '#f97316' : '#94a3b8' }}
-                >
-                  {workout.duration} perc
-                </Text>
-              </View>
-            )}
-            {Array.isArray(sections) && sections.length > 0 && (
-              <View
-                className="rounded-lg px-2 py-1"
-                style={{ backgroundColor: isNext ? 'rgba(249,115,22,0.14)' : '#1e293b', borderWidth: 1, borderColor: '#1e2a3f' }}
-              >
-                <Text
-                  className="text-xs"
-                  style={{ color: isNext ? '#f97316' : '#94a3b8' }}
-                >
-                  {sections.length} szekció
-                </Text>
-              </View>
-            )}
-          </View>
-        </View>
-        <Ionicons name="chevron-forward" size={20} color="#475569" />
+        )}
       </View>
+
+      <View className="flex-1">
+        <Text className="text-white font-semibold" style={{ fontSize: 14.5 }}>
+          {shortTitle}
+        </Text>
+        <Text style={{ fontSize: 12, color: statusColor, marginTop: 2 }}>
+          {statusText}
+        </Text>
+      </View>
+
+      <Ionicons name="chevron-forward" size={18} color="#475569" />
     </TouchableOpacity>
   );
 }
 
-type ListItem =
-  | { type: 'header'; label: string }
-  | { type: 'workout'; workout: Workout; isNext: boolean }
-  | { type: 'empty' };
-
 export default function WorkoutsScreen() {
+  const router = useRouter();
   const { data: workouts, isLoading } = useWorkouts();
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
 
-  const listItems = useMemo<ListItem[]>(() => {
-    if (!workouts || workouts.length === 0) return [];
-
-    const today = new Date().toISOString().split('T')[0];
-
-    const upcoming = [...workouts]
-      .filter(w => w.date >= today)
-      .sort((a, b) => a.date.localeCompare(b.date));
-
-    const past = [...workouts]
-      .filter(w => w.date < today)
-      .sort((a, b) => b.date.localeCompare(a.date));
-
-    const items: ListItem[] = [];
-
-    if (upcoming.length > 0) {
-      items.push({ type: 'header', label: 'Közelgő edzések' });
-      upcoming.forEach((w, i) =>
-        items.push({ type: 'workout', workout: w, isNext: i === 0 })
-      );
-    }
-
-    if (past.length > 0) {
-      items.push({ type: 'header', label: 'Korábbi edzések' });
-      past.forEach(w =>
-        items.push({ type: 'workout', workout: w, isNext: false })
-      );
-    }
-
-    return items;
-  }, [workouts]);
+  const { sortedWorkouts, heroWorkout, completedCount } = useMemo(() => {
+    const sorted = [...(workouts ?? [])].sort((a, b) => a.date.localeCompare(b.date));
+    const completed = sorted.filter(w => w.date < todayStr).length;
+    const heroIdx = sorted.findIndex(w => w.date >= todayStr);
+    const hero =
+      heroIdx >= 0
+        ? sorted[heroIdx]
+        : sorted.length > 0
+        ? sorted[sorted.length - 1]
+        : null;
+    return { sortedWorkouts: sorted, heroWorkout: hero, completedCount: completed };
+  }, [workouts, todayStr]);
 
   if (isLoading) {
     return (
@@ -137,20 +219,24 @@ export default function WorkoutsScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0f172a' }}>
-      <View className="px-4 pt-4 pb-3">
+      <View className="px-5 pt-4 pb-2">
         <Text
           className="text-slate-500 font-semibold mb-0.5"
           style={{ fontSize: 12, letterSpacing: 1.2, textTransform: 'uppercase' }}
         >
-          Heti terv
+          {sortedWorkouts.length > 0
+            ? `Heti terv · ${completedCount} / ${sortedWorkouts.length}`
+            : 'Heti terv'}
         </Text>
-        <Text className="text-white text-2xl font-bold" style={{ letterSpacing: -0.5 }}>
+        <Text className="text-white font-extrabold" style={{ fontSize: 28, letterSpacing: -0.5 }}>
           Edzések
         </Text>
       </View>
 
-      {listItems.length === 0 ? (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 }}>
+      {sortedWorkouts.length === 0 ? (
+        <View
+          style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 }}
+        >
           <Ionicons name="fitness-outline" size={64} color="#334155" />
           <Text className="text-white text-lg font-bold mt-4">Nincs edzésterved</Text>
           <Text className="text-slate-400 text-center mt-2">
@@ -158,31 +244,35 @@ export default function WorkoutsScreen() {
           </Text>
         </View>
       ) : (
-        <FlatList
-          data={listItems}
-          keyExtractor={(item, index) => {
-            if (item.type === 'workout') return item.workout.id;
-            return `${item.type}-${index}`;
-          }}
-          renderItem={({ item }) => {
-            if (item.type === 'header') {
-              return (
-                <Text
-                  className="text-slate-500 font-bold px-4 mb-2 mt-3"
-                  style={{ fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase' }}
-                >
-                  {item.label}
-                </Text>
-              );
-            }
-            if (item.type === 'workout') {
-              return <WorkoutCard workout={item.workout} isNext={item.isNext} />;
-            }
-            return null;
-          }}
+        <ScrollView
+          className="flex-1"
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 20, paddingTop: 4 }}
-        />
+          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 32 }}
+        >
+          {heroWorkout && (
+            <HeroCard
+              workout={heroWorkout}
+              onPress={() => router.push(`/(tabs)/workouts/${heroWorkout.id}`)}
+            />
+          )}
+
+          <Text
+            className="text-slate-500 font-bold mb-3"
+            style={{ fontSize: 11.5, letterSpacing: 1.3, textTransform: 'uppercase' }}
+          >
+            Heti program
+          </Text>
+
+          {sortedWorkouts.map((workout, index) => (
+            <WeeklyRow
+              key={workout.id}
+              workout={workout}
+              status={getStatus(workout.date, todayStr)}
+              dayLetter={getDayLetter(workout.title, index)}
+              onPress={() => router.push(`/(tabs)/workouts/${workout.id}`)}
+            />
+          ))}
+        </ScrollView>
       )}
     </SafeAreaView>
   );

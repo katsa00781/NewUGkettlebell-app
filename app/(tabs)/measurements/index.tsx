@@ -2,15 +2,21 @@ import { ScrollView, View, Text, TouchableOpacity, ActivityIndicator } from 'rea
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useLatestMeasurement } from '@/hooks/useMeasurements';
-import { useLatestFmsAssessment } from '@/hooks/useFMS';
+import { useLatestMeasurement, useUserMeasurements } from '@/hooks/useMeasurements';
+import { useLatestFmsAssessment, useFmsAssessments } from '@/hooks/useFMS';
 import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
+
+type HistoryItem =
+  | { type: 'testkompo'; id: string; date: string; weight: number; body_fat_pct: number | null }
+  | { type: 'fms'; id: string; date: string; total_score: number };
 
 export default function MeasurementsScreen() {
   const router = useRouter();
   const { data: latestMeasurement, isLoading: loadingMeasurement } = useLatestMeasurement();
   const { data: latestFms, isLoading: loadingFms } = useLatestFmsAssessment();
+  const { data: allMeasurements } = useUserMeasurements();
+  const { data: allFms } = useFmsAssessments();
 
   const fmsColor = latestFms
     ? latestFms.total_score >= 14
@@ -19,6 +25,32 @@ export default function MeasurementsScreen() {
       ? '#f59e0b'
       : '#ef4444'
     : '#94a3b8';
+
+  const fmsLabel = latestFms
+    ? latestFms.total_score >= 14
+      ? 'JÓ'
+      : latestFms.total_score >= 11
+      ? 'KÖZEPES'
+      : 'GYENGE'
+    : '';
+
+  const historyItems: HistoryItem[] = [
+    ...(allMeasurements ?? []).map((m) => ({
+      type: 'testkompo' as const,
+      id: m.id,
+      date: m.date,
+      weight: m.weight,
+      body_fat_pct: m.body_fat_pct ?? null,
+    })),
+    ...(allFms ?? []).map((f) => ({
+      type: 'fms' as const,
+      id: f.id,
+      date: f.date,
+      total_score: f.total_score,
+    })),
+  ]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 6);
 
   return (
     <SafeAreaView className="flex-1 bg-slate-900">
@@ -37,10 +69,7 @@ export default function MeasurementsScreen() {
       <ScrollView className="flex-1 px-4 pt-3" showsVerticalScrollIndicator={false}>
 
         {/* FMS kártya */}
-        <View
-          className="bg-slate-800 rounded-2xl mb-3"
-          style={{ borderWidth: 1, borderColor: '#1e2a3f' }}
-        >
+        <View className="bg-slate-800 rounded-2xl mb-3" style={{ borderWidth: 1, borderColor: '#1e2a3f' }}>
           <View className="flex-row items-center justify-between p-4 pb-3">
             <View className="flex-row items-center gap-2">
               <View
@@ -49,12 +78,10 @@ export default function MeasurementsScreen() {
               >
                 <Ionicons name="bar-chart" size={16} color="#f97316" />
               </View>
-              <Text className="text-white font-bold text-base">FMS Felmérés</Text>
+              <Text className="text-white font-bold text-base">FMS felmérés</Text>
             </View>
             <Text className="text-slate-500 text-xs">
-              {latestFms
-                ? format(new Date(latestFms.date), 'MMM d.', { locale: hu })
-                : '–'}
+              {latestFms ? format(new Date(latestFms.date), 'MMM d.', { locale: hu }) : '–'}
             </Text>
           </View>
 
@@ -62,35 +89,17 @@ export default function MeasurementsScreen() {
             {loadingFms ? (
               <ActivityIndicator color="#f97316" size="small" />
             ) : latestFms ? (
-              <View className="flex-row items-center gap-3">
+              <View className="flex-row items-center justify-between">
+                <Text style={{ color: '#f97316', fontSize: 34, fontWeight: '700', letterSpacing: -1 }}>
+                  {latestFms.total_score}
+                  <Text style={{ fontSize: 18, color: '#94a3b8', fontWeight: '600' }}>/21</Text>
+                </Text>
                 <View
-                  className="rounded-xl px-5 py-2"
-                  style={{ backgroundColor: 'rgba(249,115,22,0.14)', borderWidth: 1, borderColor: 'rgba(249,115,22,0.35)' }}
+                  className="rounded-full px-4 py-1.5"
+                  style={{ borderWidth: 1.5, borderColor: fmsColor, backgroundColor: fmsColor + '20' }}
                 >
-                  <Text style={{ color: fmsColor, fontSize: 28, fontWeight: '700', letterSpacing: -0.5 }}>
-                    {latestFms.total_score}
-                    <Text style={{ fontSize: 15, color: '#94a3b8', fontWeight: '600' }}>/21</Text>
-                  </Text>
-                </View>
-                <View>
-                  <View
-                    className="rounded-full px-3 py-1 mb-1"
-                    style={{
-                      borderWidth: 1,
-                      borderColor: fmsColor,
-                      backgroundColor: fmsColor + '20',
-                    }}
-                  >
-                    <Text style={{ color: fmsColor, fontSize: 11, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase' }}>
-                      {latestFms.total_score >= 14 ? 'JÓ' : latestFms.total_score >= 11 ? 'KÖZEPES' : 'GYENGE'}
-                    </Text>
-                  </View>
-                  <Text className="text-slate-400 text-xs">
-                    {latestFms.total_score >= 14
-                      ? 'Megfelelő mozgáskontroll'
-                      : latestFms.total_score >= 11
-                      ? 'Enyhe diszfunkció'
-                      : 'Mozgásdiszfunkció'}
+                  <Text style={{ color: fmsColor, fontSize: 12, fontWeight: '700', letterSpacing: 1 }}>
+                    {fmsLabel}
                   </Text>
                 </View>
               </View>
@@ -112,10 +121,7 @@ export default function MeasurementsScreen() {
         </View>
 
         {/* Testkompo kártya */}
-        <View
-          className="bg-slate-800 rounded-2xl mb-3"
-          style={{ borderWidth: 1, borderColor: '#1e2a3f' }}
-        >
+        <View className="bg-slate-800 rounded-2xl mb-3" style={{ borderWidth: 1, borderColor: '#1e2a3f' }}>
           <View className="flex-row items-center justify-between p-4 pb-3">
             <View className="flex-row items-center gap-2">
               <View
@@ -124,12 +130,10 @@ export default function MeasurementsScreen() {
               >
                 <Ionicons name="body" size={16} color="#f97316" />
               </View>
-              <Text className="text-white font-bold text-base">Testkomponens</Text>
+              <Text className="text-white font-bold text-base">Testkompo mérés</Text>
             </View>
             <Text className="text-slate-500 text-xs">
-              {latestMeasurement
-                ? format(new Date(latestMeasurement.date), 'MMM d.', { locale: hu })
-                : '–'}
+              {latestMeasurement ? format(new Date(latestMeasurement.date), 'MMM d.', { locale: hu }) : '–'}
             </Text>
           </View>
 
@@ -137,17 +141,27 @@ export default function MeasurementsScreen() {
             {loadingMeasurement ? (
               <ActivityIndicator color="#f97316" size="small" />
             ) : latestMeasurement ? (
-              <View className="flex-row flex-wrap" style={{ gap: 10 }}>
-                <MetricRow label="Testsúly" value={`${latestMeasurement.weight}`} unit="kg" />
-                {latestMeasurement.body_fat_pct != null && (
-                  <MetricRow label="Testzsír" value={`${latestMeasurement.body_fat_pct}`} unit="%" />
-                )}
-                {latestMeasurement.muscle_mass_kg != null && (
-                  <MetricRow label="Izomtömeg" value={`${latestMeasurement.muscle_mass_kg}`} unit="kg" />
-                )}
-                {latestMeasurement.bmi != null && (
-                  <MetricRow label="BMI" value={`${latestMeasurement.bmi.toFixed(1)}`} unit="" />
-                )}
+              <View style={{ gap: 8 }}>
+                <View className="flex-row justify-between">
+                  <MetricItem label="Testsúly" value={`${latestMeasurement.weight}`} unit="kg" />
+                  {latestMeasurement.body_fat_pct != null ? (
+                    <MetricItem label="Testzsír" value={`${latestMeasurement.body_fat_pct}`} unit="%" />
+                  ) : (
+                    <View style={{ minWidth: '45%' }} />
+                  )}
+                </View>
+                <View className="flex-row justify-between">
+                  {latestMeasurement.muscle_mass_kg != null ? (
+                    <MetricItem label="Izomtömeg" value={`${latestMeasurement.muscle_mass_kg}`} unit="kg" />
+                  ) : (
+                    <View style={{ minWidth: '45%' }} />
+                  )}
+                  {latestMeasurement.bmi != null ? (
+                    <MetricItem label="BMI" value={`${latestMeasurement.bmi.toFixed(1)}`} unit="" />
+                  ) : (
+                    <View style={{ minWidth: '45%' }} />
+                  )}
+                </View>
               </View>
             ) : (
               <View className="flex-row items-center gap-2 py-1">
@@ -166,18 +180,75 @@ export default function MeasurementsScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* Előzmények */}
+        {historyItems.length > 0 && (
+          <>
+            <Text
+              className="text-slate-500 font-semibold mb-2 mt-1"
+              style={{ fontSize: 12, letterSpacing: 1.2, textTransform: 'uppercase' }}
+            >
+              Előzmények
+            </Text>
+            <View className="bg-slate-800 rounded-2xl" style={{ borderWidth: 1, borderColor: '#1e2a3f' }}>
+              {historyItems.map((item, index) => (
+                <TouchableOpacity
+                  key={`${item.type}-${item.id}`}
+                  className="flex-row items-center px-4 py-3"
+                  style={
+                    index < historyItems.length - 1
+                      ? { borderBottomWidth: 1, borderBottomColor: '#1e2a3f' }
+                      : undefined
+                  }
+                  onPress={() =>
+                    router.push(
+                      item.type === 'fms'
+                        ? '/(tabs)/measurements/fms'
+                        : '/(tabs)/measurements/body'
+                    )
+                  }
+                >
+                  <View
+                    className="w-8 h-8 rounded-xl items-center justify-center mr-3"
+                    style={{ backgroundColor: 'rgba(249,115,22,0.14)' }}
+                  >
+                    <Ionicons
+                      name={item.type === 'fms' ? 'bar-chart' : 'body'}
+                      size={16}
+                      color="#f97316"
+                    />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-white font-semibold text-sm">
+                      {item.type === 'fms' ? 'FMS felmérés' : 'Testkompo'}
+                    </Text>
+                    <Text className="text-slate-400 text-xs mt-0.5">
+                      {format(new Date(item.date), 'MMM d.', { locale: hu })}
+                    </Text>
+                  </View>
+                  <Text className="text-slate-300 text-sm mr-2">
+                    {item.type === 'testkompo'
+                      ? `${item.weight} kg${item.body_fat_pct != null ? ` · ${item.body_fat_pct}%` : ''}`
+                      : `${item.total_score}/21`}
+                  </Text>
+                  <Ionicons name="chevron-forward" size={16} color="#475569" />
+                </TouchableOpacity>
+              ))}
+            </View>
+          </>
+        )}
+
         <View className="h-8" />
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-function MetricRow({ label, value, unit }: { label: string; value: string; unit: string }) {
+function MetricItem({ label, value, unit }: { label: string; value: string; unit: string }) {
   return (
-    <View style={{ width: '47%' }}>
+    <View style={{ minWidth: '45%' }}>
       <Text className="text-slate-400" style={{ fontSize: 12 }}>{label}</Text>
       <View className="flex-row items-baseline gap-0.5">
-        <Text className="text-white font-bold" style={{ fontSize: 16 }}>{value}</Text>
+        <Text className="text-white font-bold" style={{ fontSize: 18 }}>{value}</Text>
         {unit ? <Text className="text-slate-500" style={{ fontSize: 11, fontWeight: '600' }}>{unit}</Text> : null}
       </View>
     </View>
