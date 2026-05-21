@@ -349,27 +349,39 @@ export interface Database {
       user_weights: {
         Row: {
           id: string
-          user_id: string
-          weight: number
+          user_id: string | null
+          weight: number | null
+          bodyfat: number | null
+          muscle: number | null
+          bmi: number | null
+          deep_sleep: number | null
+          rest_rating: number | null
           date: string
-          notes: string | null
-          created_at: string
+          created_at: string | null
         }
         Insert: {
           id?: string
-          user_id: string
-          weight: number
+          user_id?: string | null
+          weight?: number | null
+          bodyfat?: number | null
+          muscle?: number | null
+          bmi?: number | null
+          deep_sleep?: number | null
+          rest_rating?: number | null
           date: string
-          notes?: string | null
-          created_at?: string
+          created_at?: string | null
         }
         Update: {
           id?: string
-          user_id?: string
-          weight?: number
+          user_id?: string | null
+          weight?: number | null
+          bodyfat?: number | null
+          muscle?: number | null
+          bmi?: number | null
+          deep_sleep?: number | null
+          rest_rating?: number | null
           date?: string
-          notes?: string | null
-          created_at?: string
+          created_at?: string | null
         }
         Relationships: []
       }

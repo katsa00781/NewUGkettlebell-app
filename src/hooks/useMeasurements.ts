@@ -26,7 +26,8 @@ export function useAddMeasurement() {
   return useMutation({
     mutationFn: addMeasurement,
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['measurements', user?.id] });
+      qc.invalidateQueries({ queryKey: ['measurements'] });
+      qc.invalidateQueries({ queryKey: ['weights', user?.id] });
     },
   });
 }
@@ -37,7 +38,8 @@ export function useDeleteMeasurement() {
   return useMutation({
     mutationFn: deleteMeasurement,
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['measurements', user?.id] });
+      qc.invalidateQueries({ queryKey: ['measurements'] });
+      qc.invalidateQueries({ queryKey: ['weights', user?.id] });
     },
   });
 }

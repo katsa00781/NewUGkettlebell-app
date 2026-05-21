@@ -6,10 +6,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { useWorkouts } from '@/hooks/useWorkouts';
 import { useUserWeights } from '@/hooks/useProgress';
 import { useLatestFmsAssessment } from '@/hooks/useFMS';
-import { format } from 'date-fns';
+import { useLatestMeasurement, useUserMeasurements } from '@/hooks/useMeasurements';
+import { format, subDays, parseISO } from 'date-fns';
 import { hu } from 'date-fns/locale';
+import type { UserMeasurement } from '@/types/supabase';
 
-function StatCard({ label, value, icon, color }: { label: string; value: string; icon: string; color: string }) {
+function StatCard({ label, value, icon }: { label: string; value: string; icon: string }) {
   return (
     <View className="flex-1 bg-slate-800 rounded-2xl p-4 mx-1">
       <Text style={{ fontSize: 24 }}>{icon}</Text>
@@ -19,17 +21,117 @@ function StatCard({ label, value, icon, color }: { label: string; value: string;
   );
 }
 
+function DeltaText({
+  delta,
+  unit,
+  trend = 'neutral',
+}: {
+  delta: number | null;
+  unit: string;
+  trend?: 'lower-better' | 'higher-better' | 'neutral';
+}) {
+  if (delta === null) return <Text className="text-slate-500 text-xs mt-0.5">–</Text>;
+  if (Math.abs(delta) < 0.05) return <Text className="text-slate-400 text-xs mt-0.5">0 {unit}</Text>;
+
+  let color = 'text-slate-300';
+  if (trend === 'lower-better') color = delta < 0 ? 'text-green-400' : 'text-red-400';
+  if (trend === 'higher-better') color = delta > 0 ? 'text-green-400' : 'text-red-400';
+
+  const sign = delta > 0 ? '+' : '';
+  return (
+    <Text className={`text-xs mt-0.5 ${color}`}>
+      {sign}{delta.toFixed(1)} {unit}
+    </Text>
+  );
+}
+
+function BodyCompWidget({
+  latest,
+  ref30d,
+  onPress,
+}: {
+  latest: UserMeasurement | null;
+  ref30d: UserMeasurement | null;
+  onPress: () => void;
+}) {
+  const weightDelta =
+    latest?.weight != null && ref30d?.weight != null ? latest.weight - ref30d.weight : null;
+  const fatDelta =
+    latest?.body_fat_pct != null && ref30d?.body_fat_pct != null
+      ? latest.body_fat_pct - ref30d.body_fat_pct
+      : null;
+  const muscleDelta =
+    latest?.muscle_mass_kg != null && ref30d?.muscle_mass_kg != null
+      ? latest.muscle_mass_kg - ref30d.muscle_mass_kg
+      : null;
+
+  return (
+    <TouchableOpacity className="bg-slate-800 rounded-2xl p-4 mb-6" onPress={onPress}>
+      <View className="flex-row justify-between items-center mb-3">
+        <Text className="text-white text-base font-bold">Testkompo</Text>
+        <Text className="text-slate-500 text-xs">
+          {latest
+            ? format(parseISO(latest.date), 'yyyy. MMM d.', { locale: hu })
+            : '–'}
+        </Text>
+      </View>
+
+      {latest ? (
+        <>
+          <View className="flex-row justify-between">
+            <View className="flex-1 items-center">
+              <Text className="text-slate-400 text-xs mb-1">Testsúly</Text>
+              <Text className="text-white font-semibold text-sm">{latest.weight} kg</Text>
+              <DeltaText delta={weightDelta} unit="kg" trend="neutral" />
+            </View>
+            <View className="w-px bg-slate-700 mx-2" />
+            <View className="flex-1 items-center">
+              <Text className="text-slate-400 text-xs mb-1">Testzsír</Text>
+              <Text className="text-white font-semibold text-sm">
+                {latest.body_fat_pct != null ? `${latest.body_fat_pct} %` : '–'}
+              </Text>
+              <DeltaText delta={fatDelta} unit="%" trend="lower-better" />
+            </View>
+            <View className="w-px bg-slate-700 mx-2" />
+            <View className="flex-1 items-center">
+              <Text className="text-slate-400 text-xs mb-1">Izomtömeg</Text>
+              <Text className="text-white font-semibold text-sm">
+                {latest.muscle_mass_kg != null ? `${latest.muscle_mass_kg} kg` : '–'}
+              </Text>
+              <DeltaText delta={muscleDelta} unit="kg" trend="higher-better" />
+            </View>
+          </View>
+          {ref30d && (
+            <Text className="text-slate-600 text-xs mt-3 text-center">változás az elmúlt 30 napban</Text>
+          )}
+        </>
+      ) : (
+        <View className="items-center py-2">
+          <Text className="text-slate-400 text-sm">Még nincs mérés rögzítve</Text>
+          <Text className="text-orange-500 text-xs mt-1">Mérés hozzáadása →</Text>
+        </View>
+      )}
+    </TouchableOpacity>
+  );
+}
+
 export default function DashboardScreen() {
   const router = useRouter();
   const { profile } = useAuth();
   const { data: workouts, isLoading: workoutsLoading } = useWorkouts();
   const { data: weights } = useUserWeights();
   const { data: latestFms } = useLatestFmsAssessment();
+  const { data: latestMeasurement } = useLatestMeasurement();
+  const { data: allMeasurements } = useUserMeasurements();
 
   const latestWeight = weights && weights.length > 0 ? weights[weights.length - 1] : null;
   const recentWorkouts = workouts?.slice(0, 3) ?? [];
-
   const firstName = profile?.first_name ?? profile?.full_name?.split(' ')[0] ?? 'Sportoló';
+
+  const thirtyDaysAgo = subDays(new Date(), 30);
+  const refMeasurement: UserMeasurement | null = allMeasurements
+    ? (allMeasurements.find(m => parseISO(m.date) <= thirtyDaysAgo) ?? null)
+    : null;
 
   return (
     <SafeAreaView className="flex-1 bg-slate-900">
@@ -52,21 +154,25 @@ export default function DashboardScreen() {
               label="Edzések száma"
               value={String(workouts?.length ?? 0)}
               icon="🏃"
-              color="#f97316"
             />
             <StatCard
               label="Aktuális súly"
               value={latestWeight ? `${latestWeight.weight} kg` : '–'}
               icon="⚖️"
-              color="#3b82f6"
             />
             <StatCard
               label="FMS pontszám"
               value={latestFms ? String(latestFms.total_score) : '–'}
               icon="📊"
-              color="#10b981"
             />
           </View>
+
+          {/* Testkompo widget */}
+          <BodyCompWidget
+            latest={latestMeasurement ?? null}
+            ref30d={refMeasurement}
+            onPress={() => router.push('/(tabs)/measurements/body')}
+          />
 
           {/* Recent Workouts */}
           <View className="mb-6">
@@ -116,8 +222,8 @@ export default function DashboardScreen() {
             <Text className="text-white text-lg font-bold mb-3">Gyors műveletek</Text>
             <View className="flex-row flex-wrap gap-2">
               {[
-                { label: 'Súlymérés', icon: 'scale', route: '/(tabs)/profile/progress' },
-                { label: 'FMS felmérés', icon: 'bar-chart', route: '/(tabs)/profile/fms' },
+                { label: 'Testkompo mérés', icon: 'body', route: '/(tabs)/measurements/body' },
+                { label: 'FMS felmérés', icon: 'bar-chart', route: '/(tabs)/measurements/fms' },
               ].map((action) => (
                 <TouchableOpacity
                   key={action.label}

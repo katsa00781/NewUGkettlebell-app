@@ -1,11 +1,11 @@
 # Underground KB Mobile – Backlog / Jelenlegi állapot
 
 > Frissítsd ezt a fájlt minden befejezett feladat után!
-> Dátum: 2026-05-21
+> Dátum: 2026-05-21 (P3 bug fix kész)
 
 ---
 
-## Jelenlegi állapot: P2 KÉSZ – P3 következik
+## Jelenlegi állapot: P3 KÉSZ – P4 következik
 
 ### ✅ Kész és működik
 
@@ -25,22 +25,18 @@
 | **P0 – Cleanup kész** | Appointments tab + hooks + lib törölve; planner + create + workoutGenerator törölve; workoutStore cleanup kész |
 | **P1 – Testkompo mérések** | `src/lib/measurements.ts`, `src/hooks/useMeasurements.ts`, `app/(tabs)/measurements/` (index + body + fms), `src/components/measurements/MeasurementCard.tsx`, BMI auto-számítás profil magasság alapján |
 | **P2 – Progress grafikonok** | `app/(tabs)/progress/_layout.tsx` + `index.tsx`; Progress tab a `_layout.tsx`-be; időszak választó (1/3/6 hó, összes); delta kártyák; LineChart (testsúly, testzsír%, izomtömeg); BarChart (FMS pontszám) |
+| **P3 – Dashboard frissítés** | `app/(tabs)/dashboard.tsx` – Testkompo widget (latest weight/body_fat/muscle + 30 napos delta); Gyors műveletek javítva (`measurements/body`, `measurements/fms`); `DeltaText` komponens trend-alapú színezéssel |
+| **P3 bugfix – Testkompo adatok nem töltődtek be** | `src/types/supabase.ts` (user_weights típus javítva: bodyfat/muscle/bmi hozzáadva, notes törölve); `src/lib/measurements.ts` (user_weights-ból olvas, mezők leképezve); `src/lib/weights.ts`, `src/hooks/useProgress.ts`, `app/(tabs)/measurements/body.tsx`, `app/(tabs)/profile/progress.tsx` (notes referenciák eltávolítva) |
 
 ---
 
 ### 🔨 Folyamatban / Következő
 
-**P3 – Dashboard frissítés** – ez a következő lépés.
+**P4 – Edzésterv nézet** – ez a következő lépés (egyeztetés szükséges).
 
 ---
 
 ## Backlog (prioritás szerint)
-
-### P3 – Dashboard frissítés
-
-- [ ] Legutóbbi testkompo widget (`useLatestMeasurement` – hook már megvan)
-- [ ] Gyors műveletek frissítése (Testkompo mérés → `/(tabs)/measurements/body`, FMS → `/(tabs)/measurements/fms`)
-- [ ] Quick stats kártya (30 napos súlyváltozás, testzsír% változás)
 
 ### P4 – Edzésterv nézet
 
@@ -64,7 +60,7 @@
 | # | Kérdés | Státusz |
 |---|--------|---------|
 | 1 | Melyik Supabase tábla tárolja a webes app edzéstervét? | ❓ Nyitott – P4 előtt kell dönteni |
-| 2 | Dashboard „Gyors műveletek" még régi route-okra (profile/progress, profile/fms) mutat – frissíteni kell P3-ban | ⚠️ P3-ban javítandó |
+| 2 | Dashboard „Gyors műveletek" még régi route-okra (profile/progress, profile/fms) mutat – frissíteni kell P3-ban | ✅ P3-ban javítva |
 | 3 | Progress tab hozzáadva a `_layout.tsx`-be | ✅ Kész |
 
 ---

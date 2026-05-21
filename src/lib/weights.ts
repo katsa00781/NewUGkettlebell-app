@@ -14,13 +14,13 @@ export async function getUserWeights(userId: string): Promise<UserWeight[]> {
   return data ?? [];
 }
 
-export async function addWeight(weight: number, date: string, notes?: string): Promise<UserWeight> {
+export async function addWeight(weight: number, date: string): Promise<UserWeight> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
   const { data, error } = await supabase
     .from('user_weights')
-    .insert({ user_id: user.id, weight, date, notes: notes ?? null })
+    .insert({ user_id: user.id, weight, date })
     .select()
     .single();
 

@@ -15,8 +15,8 @@ export function useAddWeight() {
   const qc = useQueryClient();
   const { user } = useAuth();
   return useMutation({
-    mutationFn: ({ weight, date, notes }: { weight: number; date: string; notes?: string }) =>
-      addWeight(weight, date, notes),
+    mutationFn: ({ weight, date }: { weight: number; date: string }) =>
+      addWeight(weight, date),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['weights', user?.id] }),
   });
 }

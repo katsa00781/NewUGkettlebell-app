@@ -28,9 +28,6 @@ const FIELDS: FormField[] = [
   { key: 'weight', label: 'Testsúly', unit: 'kg', placeholder: '75.0', decimal: true },
   { key: 'body_fat_pct', label: 'Testzsír', unit: '%', placeholder: '18.5', decimal: true },
   { key: 'muscle_mass_kg', label: 'Izomtömeg', unit: 'kg', placeholder: '35.0', decimal: true },
-  { key: 'visceral_fat', label: 'Zsigeri zsír', unit: 'index', placeholder: '8', decimal: true },
-  { key: 'body_water_pct', label: 'Testfolyadék', unit: '%', placeholder: '55.0', decimal: true },
-  { key: 'bone_mass_kg', label: 'Csonttömeg', unit: 'kg', placeholder: '3.5', decimal: true },
 ];
 
 type FormValues = Record<string, string>;
@@ -39,10 +36,6 @@ const EMPTY_FORM: FormValues = {
   weight: '',
   body_fat_pct: '',
   muscle_mass_kg: '',
-  visceral_fat: '',
-  body_water_pct: '',
-  bone_mass_kg: '',
-  notes: '',
 };
 
 export default function BodyMeasurementsScreen() {
@@ -74,11 +67,7 @@ export default function BodyMeasurementsScreen() {
       weight: w,
       body_fat_pct: form.body_fat_pct ? parseFloat(form.body_fat_pct) : null,
       muscle_mass_kg: form.muscle_mass_kg ? parseFloat(form.muscle_mass_kg) : null,
-      visceral_fat: form.visceral_fat ? parseFloat(form.visceral_fat) : null,
       bmi: computedBmi,
-      body_water_pct: form.body_water_pct ? parseFloat(form.body_water_pct) : null,
-      bone_mass_kg: form.bone_mass_kg ? parseFloat(form.bone_mass_kg) : null,
-      notes: form.notes || null,
     });
 
     setForm(EMPTY_FORM);
@@ -152,19 +141,6 @@ export default function BodyMeasurementsScreen() {
                   A BMI számításhoz add meg a magasságod a Profilban.
                 </Text>
               )}
-
-              {/* Megjegyzés */}
-              <View className="mt-3">
-                <Text className="text-slate-400 text-xs mb-1">Megjegyzés</Text>
-                <TextInput
-                  style={{ backgroundColor: '#0f172a', color: 'white', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 10 }}
-                  value={form.notes}
-                  onChangeText={(v) => set('notes', v)}
-                  placeholder="Opcionális megjegyzés…"
-                  placeholderTextColor="#64748b"
-                  multiline
-                />
-              </View>
 
               <TouchableOpacity
                 className="bg-orange-500 rounded-xl py-3 items-center mt-4"

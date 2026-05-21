@@ -15,14 +15,14 @@ export default function ProgressScreen() {
 
   const [newWeight, setNewWeight] = useState('');
   const [newDate, setNewDate] = useState(new Date().toISOString().split('T')[0]);
-  const [notes, setNotes] = useState('');
   const [showForm, setShowForm] = useState(false);
 
   const latestWeight = weights && weights.length > 0 ? weights[weights.length - 1] : null;
   const firstWeight = weights && weights.length > 0 ? weights[0] : null;
-  const weightChange = latestWeight && firstWeight
-    ? (latestWeight.weight - firstWeight.weight).toFixed(1)
-    : null;
+  const weightChange =
+    latestWeight?.weight != null && firstWeight?.weight != null
+      ? (latestWeight.weight - firstWeight.weight).toFixed(1)
+      : null;
 
   async function handleAddWeight() {
     const w = parseFloat(newWeight);
@@ -30,9 +30,8 @@ export default function ProgressScreen() {
       Alert.alert('Hiba', 'Érvényes súlyt adj meg (0-999 kg)');
       return;
     }
-    await addWeight.mutateAsync({ weight: w, date: newDate, notes: notes || undefined });
+    await addWeight.mutateAsync({ weight: w, date: newDate });
     setNewWeight('');
-    setNotes('');
     setShowForm(false);
   }
 
@@ -130,9 +129,6 @@ export default function ProgressScreen() {
                 <Text className="text-slate-400 text-xs mt-0.5">
                   {format(new Date(w.date), 'yyyy. MMM d.', { locale: hu })}
                 </Text>
-                {w.notes && (
-                  <Text className="text-slate-500 text-xs mt-0.5">{w.notes}</Text>
-                )}
               </View>
               <TouchableOpacity
                 className="p-2"
