@@ -306,9 +306,12 @@ export interface Database {
           hurdle_step: number
           inline_lunge: number
           shoulder_mobility: number
+          sm_clearing: boolean
           active_straight_leg_raise: number
           trunk_stability_pushup: number
+          tspu_clearing: boolean
           rotary_stability: number
+          rs_clearing: boolean
           total_score: number
           notes: string | null
           created_at: string
@@ -322,9 +325,12 @@ export interface Database {
           hurdle_step: number
           inline_lunge: number
           shoulder_mobility: number
+          sm_clearing?: boolean
           active_straight_leg_raise: number
           trunk_stability_pushup: number
+          tspu_clearing?: boolean
           rotary_stability: number
+          rs_clearing?: boolean
           notes?: string | null
           created_at?: string
           updated_at?: string
@@ -337,9 +343,12 @@ export interface Database {
           hurdle_step?: number
           inline_lunge?: number
           shoulder_mobility?: number
+          sm_clearing?: boolean
           active_straight_leg_raise?: number
           trunk_stability_pushup?: number
+          tspu_clearing?: boolean
           rotary_stability?: number
+          rs_clearing?: boolean
           notes?: string | null
           created_at?: string
           updated_at?: string

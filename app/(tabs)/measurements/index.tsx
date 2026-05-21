@@ -200,11 +200,9 @@ export default function MeasurementsScreen() {
                       : undefined
                   }
                   onPress={() =>
-                    router.push(
-                      item.type === 'fms'
-                        ? '/(tabs)/measurements/fms'
-                        : '/(tabs)/measurements/body'
-                    )
+                    item.type === 'fms'
+                      ? router.push({ pathname: '/(tabs)/measurements/fms', params: { assessmentId: item.id } })
+                      : router.push('/(tabs)/measurements/body')
                   }
                 >
                   <View

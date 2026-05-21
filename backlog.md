@@ -1,7 +1,7 @@
 # Underground KB Mobile – Backlog / Jelenlegi állapot
 
 > Frissítsd ezt a fájlt minden befejezett feladat után!
-> Dátum: 2026-05-21 (P5 kész)
+> Dátum: 2026-05-21 (FMS UI redesign kész)
 
 ---
 
@@ -29,6 +29,7 @@
 | **P3 bugfix – Testkompo adatok nem töltődtek be** | `src/types/supabase.ts` (user_weights típus javítva: bodyfat/muscle/bmi hozzáadva, notes törölve); `src/lib/measurements.ts` (user_weights-ból olvas, mezők leképezve); `src/lib/weights.ts`, `src/hooks/useProgress.ts`, `app/(tabs)/measurements/body.tsx`, `app/(tabs)/profile/progress.tsx` (notes referenciák eltávolítva) |
 | **P4 – Edzésterv nézet (csak olvasás)** | `app/(tabs)/workouts/index.tsx` – read-only lista; törlés/duplikálás eltávolítva; „Közelgő edzések" szekció (következő edzés narancs kiemelővel + „Mai edzés"/„Következő edzés" badge); „Korábbi edzések" szekció; empty state |
 | **P5 – Workout Logger** | `src/types/supabase.ts` (workout_logs típus); `src/lib/workoutLog.ts`; `src/hooks/useWorkoutLog.ts`; `src/stores/workoutLogStore.ts`; `app/(tabs)/workouts/[id].tsx` – pihenő timer (visszaszámláló banner set teljesítése után), összefoglaló modal (szett/idő stat + megjegyzés), Supabase mentés |
+| **FMS UI redesign + Clearing tesztek** | `app/(tabs)/measurements/fms.tsx` – design alapján újraírva + 3 fájdalom clearing teszt (SM, TSPU, RS); `src/lib/fms.ts` – FMS_MOVEMENTS bővítve (englishLabel, description, bilateral); `src/types/supabase.ts` – sm_clearing, tspu_clearing, rs_clearing boolean mezők; Supabase migráció: `fms_clearing_tests` |
 
 ---
 
