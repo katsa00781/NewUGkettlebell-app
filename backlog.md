@@ -1,11 +1,11 @@
 # Underground KB Mobile – Backlog / Jelenlegi állapot
 
 > Frissítsd ezt a fájlt minden befejezett feladat után!
-> Dátum: 2026-05-21 (P3 bug fix kész)
+> Dátum: 2026-05-21 (P4 kész)
 
 ---
 
-## Jelenlegi állapot: P3 KÉSZ – P4 következik
+## Jelenlegi állapot: P4 KÉSZ – P5 következik
 
 ### ✅ Kész és működik
 
@@ -27,22 +27,17 @@
 | **P2 – Progress grafikonok** | `app/(tabs)/progress/_layout.tsx` + `index.tsx`; Progress tab a `_layout.tsx`-be; időszak választó (1/3/6 hó, összes); delta kártyák; LineChart (testsúly, testzsír%, izomtömeg); BarChart (FMS pontszám) |
 | **P3 – Dashboard frissítés** | `app/(tabs)/dashboard.tsx` – Testkompo widget (latest weight/body_fat/muscle + 30 napos delta); Gyors műveletek javítva (`measurements/body`, `measurements/fms`); `DeltaText` komponens trend-alapú színezéssel |
 | **P3 bugfix – Testkompo adatok nem töltődtek be** | `src/types/supabase.ts` (user_weights típus javítva: bodyfat/muscle/bmi hozzáadva, notes törölve); `src/lib/measurements.ts` (user_weights-ból olvas, mezők leképezve); `src/lib/weights.ts`, `src/hooks/useProgress.ts`, `app/(tabs)/measurements/body.tsx`, `app/(tabs)/profile/progress.tsx` (notes referenciák eltávolítva) |
+| **P4 – Edzésterv nézet (csak olvasás)** | `app/(tabs)/workouts/index.tsx` – read-only lista; törlés/duplikálás eltávolítva; „Közelgő edzések" szekció (következő edzés narancs kiemelővel + „Mai edzés"/„Következő edzés" badge); „Korábbi edzések" szekció; empty state |
 
 ---
 
 ### 🔨 Folyamatban / Következő
 
-**P4 – Edzésterv nézet** – ez a következő lépés (egyeztetés szükséges).
+**P5 – Workout Logger** – ez a következő lépés.
 
 ---
 
 ## Backlog (prioritás szerint)
-
-### P4 – Edzésterv nézet
-
-- [ ] ⚠️ Egyeztetés szükséges: melyik Supabase tábla a webes app edzésterve?
-- [ ] Terv lekérése + nézet (csak olvasás)
-- [ ] Empty state ha nincs aktív terv
 
 ### P5 – Workout Logger
 
@@ -59,7 +54,7 @@
 
 | # | Kérdés | Státusz |
 |---|--------|---------|
-| 1 | Melyik Supabase tábla tárolja a webes app edzéstervét? | ❓ Nyitott – P4 előtt kell dönteni |
+| 1 | Melyik Supabase tábla tárolja a webes app edzéstervét? | ✅ Megoldva – `workouts` tábla (user_id alapján) |
 | 2 | Dashboard „Gyors műveletek" még régi route-okra (profile/progress, profile/fms) mutat – frissíteni kell P3-ban | ✅ P3-ban javítva |
 | 3 | Progress tab hozzáadva a `_layout.tsx`-be | ✅ Kész |
 
