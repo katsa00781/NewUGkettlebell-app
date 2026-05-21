@@ -71,22 +71,6 @@ export default function WorkoutsScreen() {
     <SafeAreaView className="flex-1 bg-slate-900">
       <View className="flex-row justify-between items-center px-4 pt-4 pb-3">
         <Text className="text-white text-2xl font-bold">Edzéseim</Text>
-        <View className="flex-row gap-2">
-          <TouchableOpacity
-            className="bg-slate-700 rounded-xl px-3 py-2 flex-row items-center"
-            onPress={() => router.push('/(tabs)/workouts/planner')}
-          >
-            <Ionicons name="flash-outline" size={16} color="#f97316" />
-            <Text className="text-orange-400 font-semibold ml-1 text-sm">Tervező</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="bg-orange-500 rounded-xl px-3 py-2 flex-row items-center"
-            onPress={() => router.push('/(tabs)/workouts/create')}
-          >
-            <Ionicons name="add" size={18} color="white" />
-            <Text className="text-white font-semibold ml-1">Új</Text>
-          </TouchableOpacity>
-        </View>
       </View>
 
       {isLoading ? (

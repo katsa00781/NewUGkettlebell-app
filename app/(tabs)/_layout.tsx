@@ -45,17 +45,23 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="exercises"
+        name="measurements"
         options={{
-          title: 'Gyakorlatok',
-          tabBarIcon: ({ focused }) => <TabIcon name="barbell" focused={focused} />,
+          title: 'Mérések',
+          tabBarIcon: ({ focused }) => <TabIcon name="body" focused={focused} />,
         }}
       />
       <Tabs.Screen
-        name="appointments"
+        name="progress"
         options={{
-          title: 'Időpontok',
-          tabBarIcon: ({ focused }) => <TabIcon name="calendar" focused={focused} />,
+          title: 'Fejlődés',
+          tabBarIcon: ({ focused }) => <TabIcon name="trending-up" focused={focused} />,
+        }}
+      />
+      <Tabs.Screen
+        name="exercises"
+        options={{
+          href: null,
         }}
       />
       <Tabs.Screen

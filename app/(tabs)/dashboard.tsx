@@ -4,7 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/hooks/useAuth';
 import { useWorkouts } from '@/hooks/useWorkouts';
-import { useUpcomingAppointments } from '@/hooks/useAppointments';
 import { useUserWeights } from '@/hooks/useProgress';
 import { useLatestFmsAssessment } from '@/hooks/useFMS';
 import { format } from 'date-fns';
@@ -24,13 +23,11 @@ export default function DashboardScreen() {
   const router = useRouter();
   const { profile } = useAuth();
   const { data: workouts, isLoading: workoutsLoading } = useWorkouts();
-  const { data: appointments, isLoading: appointmentsLoading } = useUpcomingAppointments();
   const { data: weights } = useUserWeights();
   const { data: latestFms } = useLatestFmsAssessment();
 
   const latestWeight = weights && weights.length > 0 ? weights[weights.length - 1] : null;
   const recentWorkouts = workouts?.slice(0, 3) ?? [];
-  const upcomingAppointments = appointments?.slice(0, 3) ?? [];
 
   const firstName = profile?.first_name ?? profile?.full_name?.split(' ')[0] ?? 'Sportoló';
 
@@ -114,49 +111,13 @@ export default function DashboardScreen() {
             )}
           </View>
 
-          {/* Upcoming Appointments */}
-          <View className="mb-6">
-            <View className="flex-row justify-between items-center mb-3">
-              <Text className="text-white text-lg font-bold">Közelgő időpontok</Text>
-              <TouchableOpacity onPress={() => router.push('/(tabs)/appointments')}>
-                <Text className="text-orange-500 text-sm">Összes →</Text>
-              </TouchableOpacity>
-            </View>
-            {appointmentsLoading ? (
-              <ActivityIndicator color="#f97316" />
-            ) : upcomingAppointments.length === 0 ? (
-              <View className="bg-slate-800 rounded-2xl p-4 items-center">
-                <Text className="text-slate-400 text-sm">Nincs közelgő időpont</Text>
-              </View>
-            ) : (
-              upcomingAppointments.map((a) => (
-                <View key={a.id} className="bg-slate-800 rounded-2xl p-4 mb-2 flex-row items-center">
-                  <View className="w-10 h-10 bg-blue-500/20 rounded-xl items-center justify-center mr-3">
-                    <Ionicons name="calendar" size={20} color="#3b82f6" />
-                  </View>
-                  <View className="flex-1">
-                    <Text className="text-white font-semibold">{a.title}</Text>
-                    <Text className="text-slate-400 text-xs mt-0.5">
-                      {format(new Date(a.start_time), 'MMM d. HH:mm', { locale: hu })}
-                      {' · '}
-                      {a.current_participants}/{a.max_participants} fő
-                    </Text>
-                  </View>
-                </View>
-              ))
-            )}
-          </View>
-
           {/* Quick Actions */}
           <View>
             <Text className="text-white text-lg font-bold mb-3">Gyors műveletek</Text>
             <View className="flex-row flex-wrap gap-2">
               {[
-                { label: 'Edzéstervező', icon: 'flash', route: '/(tabs)/workouts/planner' },
-                { label: 'Új edzés', icon: 'add-circle', route: '/(tabs)/workouts/create' },
                 { label: 'Súlymérés', icon: 'scale', route: '/(tabs)/profile/progress' },
                 { label: 'FMS felmérés', icon: 'bar-chart', route: '/(tabs)/profile/fms' },
-                { label: 'Időpontfoglalás', icon: 'calendar-outline', route: '/(tabs)/appointments' },
               ].map((action) => (
                 <TouchableOpacity
                   key={action.label}

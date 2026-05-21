@@ -373,6 +373,51 @@ export interface Database {
         }
         Relationships: []
       }
+      user_measurements: {
+        Row: {
+          id: string
+          user_id: string
+          date: string
+          weight: number
+          body_fat_pct: number | null
+          muscle_mass_kg: number | null
+          visceral_fat: number | null
+          bmi: number | null
+          body_water_pct: number | null
+          bone_mass_kg: number | null
+          notes: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          date: string
+          weight: number
+          body_fat_pct?: number | null
+          muscle_mass_kg?: number | null
+          visceral_fat?: number | null
+          bmi?: number | null
+          body_water_pct?: number | null
+          bone_mass_kg?: number | null
+          notes?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          date?: string
+          weight?: number
+          body_fat_pct?: number | null
+          muscle_mass_kg?: number | null
+          visceral_fat?: number | null
+          bmi?: number | null
+          body_water_pct?: number | null
+          bone_mass_kg?: number | null
+          notes?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       kb_complexes: {
         Row: {
           id: string
@@ -497,3 +542,4 @@ export type Appointment = Tables<'appointments'>
 export type AppointmentParticipant = Tables<'appointments_participants'>
 export type FmsAssessment = Tables<'fms_assessments'>
 export type UserWeight = Tables<'user_weights'>
+export type UserMeasurement = Tables<'user_measurements'>
