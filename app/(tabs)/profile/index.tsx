@@ -55,7 +55,7 @@ export default function ProfileScreen() {
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <View className="px-4 pt-4 pb-6">
           <View className="flex-row justify-between items-center mb-6">
-            <Text className="text-white text-2xl font-bold">Profil</Text>
+            <Text className="text-white font-bold" style={{ fontSize: 26, letterSpacing: -0.5 }}>Profil</Text>
             <TouchableOpacity
               className="bg-orange-500 rounded-xl px-4 py-2"
               onPress={handleSave}
@@ -70,24 +70,47 @@ export default function ProfileScreen() {
 
           {/* Avatar */}
           <View className="items-center mb-6">
-            <View className="w-24 h-24 bg-orange-500/20 rounded-full items-center justify-center">
-              <Text className="text-5xl">
+            <View
+              className="w-24 h-24 rounded-full items-center justify-center"
+              style={{ backgroundColor: '#f97316' }}
+            >
+              <Text className="text-white font-extrabold" style={{ fontSize: 34 }}>
                 {firstName ? firstName[0].toUpperCase() : user?.email?.[0].toUpperCase() ?? '?'}
               </Text>
             </View>
-            <Text className="text-white font-bold text-lg mt-3">
+            <Text className="text-white font-bold text-lg mt-3" style={{ letterSpacing: -0.3 }}>
               {firstName || lastName ? `${firstName} ${lastName}`.trim() : user?.email}
             </Text>
-            <View className={`mt-2 rounded-full px-3 py-1 ${isAdmin ? 'bg-orange-500/20' : 'bg-slate-700'}`}>
-              <Text className={`text-xs font-semibold ${isAdmin ? 'text-orange-400' : 'text-slate-400'}`}>
+            <View
+              className="mt-2 rounded-full px-3 py-1"
+              style={{
+                backgroundColor: isAdmin ? 'rgba(249,115,22,0.15)' : '#1e293b',
+                borderWidth: 1,
+                borderColor: isAdmin ? 'rgba(249,115,22,0.4)' : '#334155',
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 11,
+                  fontWeight: '700',
+                  letterSpacing: 0.8,
+                  textTransform: 'uppercase',
+                  color: isAdmin ? '#f97316' : '#94a3b8',
+                }}
+              >
                 {isAdmin ? 'Admin' : 'Felhasználó'}
               </Text>
             </View>
           </View>
 
           {/* Form */}
-          <View className="bg-slate-800 rounded-2xl p-4 mb-4">
-            <Text className="text-orange-500 font-bold text-sm mb-4">Személyes adatok</Text>
+          <View className="bg-slate-800 rounded-2xl p-4 mb-4" style={{ borderWidth: 1, borderColor: '#1e2a3f' }}>
+            <Text
+              className="text-orange-500 font-bold mb-4"
+              style={{ fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase' }}
+            >
+              Személyes adatok
+            </Text>
 
             <View className="mb-3">
               <Text className="text-slate-400 text-xs mb-1">Keresztnév</Text>
@@ -138,26 +161,37 @@ export default function ProfileScreen() {
           </View>
 
           {/* Quick links */}
-          <View className="bg-slate-800 rounded-2xl mb-4">
+          <View className="bg-slate-800 rounded-2xl mb-4" style={{ borderWidth: 1, borderColor: '#1e2a3f' }}>
             {[
               { label: 'Fejlődés / Súlynapló', icon: 'trending-up', route: '/(tabs)/profile/progress' },
               { label: 'FMS Felmérés', icon: 'bar-chart', route: '/(tabs)/profile/fms' },
             ].map((item, i) => (
               <TouchableOpacity
                 key={item.label}
-                className={`flex-row items-center px-4 py-4 ${i < 1 ? 'border-b border-slate-700' : ''}`}
+                className="flex-row items-center px-4 py-4"
+                style={i < 1 ? { borderBottomWidth: 1, borderBottomColor: '#1e2a3f' } : undefined}
                 onPress={() => router.push(item.route as any)}
               >
-                <Ionicons name={item.icon as any} size={20} color="#f97316" />
-                <Text className="text-white ml-3 flex-1">{item.label}</Text>
+                <View
+                  className="w-8 h-8 rounded-lg items-center justify-center mr-3"
+                  style={{ backgroundColor: 'rgba(249,115,22,0.14)' }}
+                >
+                  <Ionicons name={item.icon as any} size={16} color="#f97316" />
+                </View>
+                <Text className="text-white flex-1 font-semibold" style={{ fontSize: 14.5 }}>{item.label}</Text>
                 <Ionicons name="chevron-forward" size={16} color="#64748b" />
               </TouchableOpacity>
             ))}
           </View>
 
           {isAdmin && (
-            <View className="bg-slate-800 rounded-2xl mb-4">
-              <Text className="text-orange-500 font-bold text-xs px-4 pt-4 pb-2">ADMIN</Text>
+            <View className="bg-slate-800 rounded-2xl mb-4" style={{ borderWidth: 1, borderColor: '#1e2a3f' }}>
+              <Text
+                className="text-orange-500 font-bold px-4 pt-4 pb-2"
+                style={{ fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase' }}
+              >
+                Admin
+              </Text>
               {[
                 { label: 'Felhasználók', icon: 'people', route: '/admin/users' },
                 { label: 'Gyakorlatok kezelése', icon: 'barbell', route: '/admin/exercises' },
@@ -165,11 +199,17 @@ export default function ProfileScreen() {
               ].map((item, i) => (
                 <TouchableOpacity
                   key={item.label}
-                  className={`flex-row items-center px-4 py-4 ${i < 2 ? 'border-b border-slate-700' : ''}`}
+                  className="flex-row items-center px-4 py-4"
+                  style={i < 2 ? { borderBottomWidth: 1, borderBottomColor: '#1e2a3f' } : undefined}
                   onPress={() => router.push(item.route as any)}
                 >
-                  <Ionicons name={item.icon as any} size={20} color="#f97316" />
-                  <Text className="text-white ml-3 flex-1">{item.label}</Text>
+                  <View
+                    className="w-8 h-8 rounded-lg items-center justify-center mr-3"
+                    style={{ backgroundColor: 'rgba(249,115,22,0.14)' }}
+                  >
+                    <Ionicons name={item.icon as any} size={16} color="#f97316" />
+                  </View>
+                  <Text className="text-white flex-1 font-semibold" style={{ fontSize: 14.5 }}>{item.label}</Text>
                   <Ionicons name="chevron-forward" size={16} color="#64748b" />
                 </TouchableOpacity>
               ))}
@@ -177,10 +217,11 @@ export default function ProfileScreen() {
           )}
 
           <TouchableOpacity
-            className="bg-red-900/30 border border-red-800/50 rounded-2xl py-4 items-center"
+            className="rounded-2xl py-4 items-center"
+            style={{ backgroundColor: 'rgba(239,68,68,0.1)', borderWidth: 1, borderColor: 'rgba(239,68,68,0.3)' }}
             onPress={handleLogout}
           >
-            <Text className="text-red-400 font-semibold">Kijelentkezés</Text>
+            <Text className="font-semibold" style={{ color: '#ef4444' }}>Kijelentkezés</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

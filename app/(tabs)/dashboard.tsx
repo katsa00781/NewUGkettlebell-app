@@ -11,12 +11,38 @@ import { format, subDays, parseISO } from 'date-fns';
 import { hu } from 'date-fns/locale';
 import type { UserMeasurement } from '@/types/supabase';
 
-function StatCard({ label, value, icon }: { label: string; value: string; icon: string }) {
+type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
+
+function StatCard({
+  label,
+  value,
+  unit,
+  iconName,
+}: {
+  label: string;
+  value: string;
+  unit?: string;
+  iconName: IoniconsName;
+}) {
   return (
-    <View className="flex-1 bg-slate-800 rounded-2xl p-4 mx-1">
-      <Text style={{ fontSize: 24 }}>{icon}</Text>
-      <Text className="text-2xl font-bold text-white mt-2">{value}</Text>
-      <Text className="text-slate-400 text-xs mt-1">{label}</Text>
+    <View
+      className="flex-1 bg-slate-800 rounded-2xl p-3 mx-1"
+      style={{ borderWidth: 1, borderColor: '#1e2a3f' }}
+    >
+      <Ionicons name={iconName} size={20} color="#f97316" style={{ marginBottom: 8 }} />
+      <View className="flex-row items-baseline">
+        <Text className="text-white font-bold" style={{ fontSize: 20, letterSpacing: -0.5 }}>
+          {value}
+        </Text>
+        {unit ? (
+          <Text className="text-slate-400 font-semibold ml-0.5" style={{ fontSize: 11 }}>
+            {unit}
+          </Text>
+        ) : null}
+      </View>
+      <Text className="text-slate-500 font-semibold mt-1" style={{ fontSize: 11 }}>
+        {label}
+      </Text>
     </View>
   );
 }
@@ -45,6 +71,17 @@ function DeltaText({
   );
 }
 
+function SectionLabel({ children }: { children: string }) {
+  return (
+    <Text
+      className="text-slate-500 font-bold mb-3"
+      style={{ fontSize: 11.5, letterSpacing: 1.3, textTransform: 'uppercase' }}
+    >
+      {children}
+    </Text>
+  );
+}
+
 function BodyCompWidget({
   latest,
   ref30d,
@@ -66,7 +103,11 @@ function BodyCompWidget({
       : null;
 
   return (
-    <TouchableOpacity className="bg-slate-800 rounded-2xl p-4 mb-6" onPress={onPress}>
+    <TouchableOpacity
+      className="bg-slate-800 rounded-2xl p-4 mb-6"
+      style={{ borderWidth: 1, borderColor: '#1e2a3f' }}
+      onPress={onPress}
+    >
       <View className="flex-row justify-between items-center mb-3">
         <Text className="text-white text-base font-bold">Testkompo</Text>
         <Text className="text-slate-500 text-xs">
@@ -133,37 +174,51 @@ export default function DashboardScreen() {
     ? (allMeasurements.find(m => parseISO(m.date) <= thirtyDaysAgo) ?? null)
     : null;
 
+  const today = new Date();
+  const dateLabel = format(today, 'EEEE, MMM. d.', { locale: hu });
+
   return (
     <SafeAreaView className="flex-1 bg-slate-900">
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        <View className="px-4 pt-4 pb-6">
+        <View className="px-5 pt-4 pb-6">
+
           {/* Header */}
-          <View className="flex-row justify-between items-center mb-6">
-            <View>
-              <Text className="text-slate-400 text-sm">Üdvözöljük,</Text>
-              <Text className="text-white text-2xl font-bold">{firstName} 💪</Text>
+          <View className="mb-6">
+            <Text
+              className="text-slate-500 font-semibold mb-1"
+              style={{ fontSize: 12.5, letterSpacing: 0.2 }}
+            >
+              {dateLabel}
+            </Text>
+            <View className="flex-row items-center gap-2 mb-1">
+              <Text className="text-white font-extrabold" style={{ fontSize: 26, letterSpacing: -0.5 }}>
+                Szia, {firstName}
+              </Text>
+              <Text style={{ fontSize: 22 }}>👊</Text>
             </View>
-            <View className="bg-orange-500/20 rounded-full p-2">
-              <Text className="text-2xl">🏋️</Text>
-            </View>
+            <Text className="text-slate-400" style={{ fontSize: 13.5 }}>
+              Készen állsz a mai edzésre?
+            </Text>
           </View>
 
           {/* Stats Row */}
           <View className="flex-row mb-6">
             <StatCard
-              label="Edzések száma"
+              label="Edzések"
               value={String(workouts?.length ?? 0)}
-              icon="🏃"
+              iconName="barbell-outline"
             />
             <StatCard
-              label="Aktuális súly"
-              value={latestWeight ? `${latestWeight.weight} kg` : '–'}
-              icon="⚖️"
+              label="Testsúly"
+              value={latestWeight ? String(latestWeight.weight) : '–'}
+              unit="kg"
+              iconName="scale-outline"
             />
             <StatCard
-              label="FMS pontszám"
+              label="FMS"
               value={latestFms ? String(latestFms.total_score) : '–'}
-              icon="📊"
+              unit="/21"
+              iconName="checkmark-circle-outline"
             />
           </View>
 
@@ -177,21 +232,24 @@ export default function DashboardScreen() {
           {/* Recent Workouts */}
           <View className="mb-6">
             <View className="flex-row justify-between items-center mb-3">
-              <Text className="text-white text-lg font-bold">Legutóbbi edzések</Text>
+              <SectionLabel>Legutóbbi edzések</SectionLabel>
               <TouchableOpacity onPress={() => router.push('/(tabs)/workouts')}>
-                <Text className="text-orange-500 text-sm">Összes →</Text>
+                <Text className="text-orange-500 text-xs font-semibold">Összes →</Text>
               </TouchableOpacity>
             </View>
             {workoutsLoading ? (
               <ActivityIndicator color="#f97316" />
             ) : recentWorkouts.length === 0 ? (
-              <View className="bg-slate-800 rounded-2xl p-4 items-center">
+              <View
+                className="bg-slate-800 rounded-2xl p-4 items-center"
+                style={{ borderWidth: 1, borderColor: '#1e2a3f' }}
+              >
                 <Text className="text-slate-400 text-sm">Még nincs rögzített edzés</Text>
                 <TouchableOpacity
                   className="mt-3 bg-orange-500/20 rounded-xl px-4 py-2"
                   onPress={() => router.push('/(tabs)/workouts')}
                 >
-                  <Text className="text-orange-500 text-sm font-semibold">Edzés hozzáadása</Text>
+                  <Text className="text-orange-500 text-sm font-semibold">Edzés megtekintése</Text>
                 </TouchableOpacity>
               </View>
             ) : (
@@ -199,9 +257,12 @@ export default function DashboardScreen() {
                 <TouchableOpacity
                   key={w.id}
                   className="bg-slate-800 rounded-2xl p-4 mb-2 flex-row items-center"
+                  style={{ borderWidth: 1, borderColor: '#1e2a3f' }}
                   onPress={() => router.push(`/(tabs)/workouts/${w.id}`)}
                 >
-                  <View className="w-10 h-10 bg-orange-500/20 rounded-xl items-center justify-center mr-3">
+                  <View className="w-10 h-10 bg-orange-500/14 rounded-xl items-center justify-center mr-3"
+                    style={{ backgroundColor: 'rgba(249,115,22,0.14)' }}
+                  >
                     <Ionicons name="fitness" size={20} color="#f97316" />
                   </View>
                   <View className="flex-1">
@@ -219,23 +280,65 @@ export default function DashboardScreen() {
 
           {/* Quick Actions */}
           <View>
-            <Text className="text-white text-lg font-bold mb-3">Gyors műveletek</Text>
-            <View className="flex-row flex-wrap gap-2">
-              {[
-                { label: 'Testkompo mérés', icon: 'body', route: '/(tabs)/measurements/body' },
-                { label: 'FMS felmérés', icon: 'bar-chart', route: '/(tabs)/measurements/fms' },
-              ].map((action) => (
-                <TouchableOpacity
-                  key={action.label}
-                  className="bg-slate-800 rounded-2xl p-4 items-center flex-1 min-w-[40%]"
-                  onPress={() => router.push(action.route as any)}
+            <SectionLabel>Gyors műveletek</SectionLabel>
+            <View className="flex-row gap-3">
+              {/* Primary action */}
+              <TouchableOpacity
+                className="flex-1 rounded-2xl p-4"
+                style={{
+                  backgroundColor: '#f97316',
+                  minHeight: 96,
+                  justifyContent: 'space-between',
+                  boxShadow: undefined,
+                  shadowColor: '#f97316',
+                  shadowOffset: { width: 0, height: 8 },
+                  shadowOpacity: 0.4,
+                  shadowRadius: 16,
+                  elevation: 8,
+                }}
+                onPress={() => router.push('/(tabs)/workouts')}
+              >
+                <View
+                  className="w-9 h-9 rounded-xl items-center justify-center mb-3"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.18)' }}
                 >
-                  <Ionicons name={action.icon as any} size={24} color="#f97316" />
-                  <Text className="text-slate-300 text-xs mt-2 text-center">{action.label}</Text>
-                </TouchableOpacity>
-              ))}
+                  <Ionicons name="flash" size={20} color="#fff" />
+                </View>
+                <Text className="text-white font-bold" style={{ fontSize: 15, letterSpacing: -0.2 }}>
+                  Edzések
+                </Text>
+                <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12, marginTop: 2 }}>
+                  Heti terv megtekintése
+                </Text>
+              </TouchableOpacity>
+
+              {/* Secondary action */}
+              <TouchableOpacity
+                className="flex-1 bg-slate-800 rounded-2xl p-4"
+                style={{
+                  borderWidth: 1,
+                  borderColor: '#1e2a3f',
+                  minHeight: 96,
+                  justifyContent: 'space-between',
+                }}
+                onPress={() => router.push('/(tabs)/measurements/body')}
+              >
+                <View
+                  className="w-9 h-9 rounded-xl items-center justify-center mb-3"
+                  style={{ backgroundColor: 'rgba(249,115,22,0.14)' }}
+                >
+                  <Ionicons name="add" size={20} color="#f97316" />
+                </View>
+                <Text className="text-white font-bold" style={{ fontSize: 15, letterSpacing: -0.2 }}>
+                  Mérés
+                </Text>
+                <Text className="text-slate-400" style={{ fontSize: 12, marginTop: 2 }}>
+                  Testkompo
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
+
         </View>
       </ScrollView>
     </SafeAreaView>

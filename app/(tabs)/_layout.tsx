@@ -20,20 +20,21 @@ export default function TabLayout() {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: '#0f172a',
-          borderTopColor: '#1e293b',
+          borderTopColor: '#1e2a3f',
           borderTopWidth: 1,
-          height: 60,
-          paddingBottom: 8,
+          height: 68,
+          paddingBottom: 16,
+          paddingTop: 6,
         },
         tabBarActiveTintColor: '#f97316',
         tabBarInactiveTintColor: '#64748b',
-        tabBarLabelStyle: { fontSize: 10, fontWeight: '600' },
+        tabBarLabelStyle: { fontSize: 10.5, fontWeight: '600', letterSpacing: 0.2 },
       }}
     >
       <Tabs.Screen
         name="dashboard"
         options={{
-          title: 'Főoldal',
+          title: 'Dashboard',
           tabBarIcon: ({ focused }) => <TabIcon name="home" focused={focused} />,
         }}
       />

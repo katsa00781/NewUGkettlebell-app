@@ -29,14 +29,22 @@ function filterByPeriod<T extends { date: string }>(items: T[], period: Period):
 
 function PeriodSelector({ value, onChange }: { value: Period; onChange: (p: Period) => void }) {
   return (
-    <View className="flex-row bg-slate-800 rounded-xl p-1 mb-4">
+    <View className="flex-row gap-2 mb-4">
       {PERIODS.map((p) => (
         <TouchableOpacity
           key={p.key}
-          className={`flex-1 py-2 rounded-lg items-center ${value === p.key ? 'bg-orange-500' : ''}`}
+          className="py-2 px-4 rounded-full"
+          style={{
+            backgroundColor: value === p.key ? '#f97316' : '#1e293b',
+            borderWidth: 1,
+            borderColor: value === p.key ? '#f97316' : '#1e2a3f',
+          }}
           onPress={() => onChange(p.key)}
         >
-          <Text className={`text-xs font-semibold ${value === p.key ? 'text-white' : 'text-slate-400'}`}>
+          <Text
+            className="font-bold"
+            style={{ fontSize: 12.5, color: value === p.key ? '#fff' : '#94a3b8' }}
+          >
             {p.label}
           </Text>
         </TouchableOpacity>
@@ -62,10 +70,15 @@ function DeltaCard({ label, first, last, unit, lowerIsBetter = false }: DeltaCar
   const sign = delta > 0 ? '+' : '';
 
   return (
-    <View className="bg-slate-800 rounded-2xl p-4 flex-1 mx-1">
-      <Text className="text-slate-400 text-xs mb-1">{label}</Text>
-      <Text className="text-white text-lg font-bold">{last}{unit}</Text>
-      <Text style={{ color }} className="text-xs font-semibold mt-1">
+    <View
+      className="bg-slate-800 rounded-2xl p-4 flex-1 mx-1"
+      style={{ borderWidth: 1, borderColor: '#1e2a3f' }}
+    >
+      <Text className="text-slate-500 font-semibold mb-1" style={{ fontSize: 11 }}>{label}</Text>
+      <Text className="text-white font-bold" style={{ fontSize: 18, letterSpacing: -0.3 }}>
+        {last}{unit}
+      </Text>
+      <Text style={{ color, fontSize: 11, fontWeight: '700' }} className="mt-1">
         {sign}{delta}{unit}
       </Text>
     </View>
@@ -77,7 +90,12 @@ type SectionProps = { title: string; children: React.ReactNode };
 function Section({ title, children }: SectionProps) {
   return (
     <View className="mb-6">
-      <Text className="text-white font-bold text-base mb-3">{title}</Text>
+      <Text
+        className="text-slate-500 font-bold mb-3"
+        style={{ fontSize: 11.5, letterSpacing: 1.2, textTransform: 'uppercase' }}
+      >
+        {title}
+      </Text>
       {children}
     </View>
   );
@@ -85,7 +103,10 @@ function Section({ title, children }: SectionProps) {
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <View className="bg-slate-800 rounded-2xl p-6 items-center">
+    <View
+      className="bg-slate-800 rounded-2xl p-6 items-center"
+      style={{ borderWidth: 1, borderColor: '#1e2a3f' }}
+    >
       <Text className="text-slate-400 text-sm">{message}</Text>
     </View>
   );
@@ -155,7 +176,15 @@ export default function ProgressScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0f172a' }}>
       <ScrollView className="flex-1 px-4 pt-4" showsVerticalScrollIndicator={false}>
-        <Text className="text-white text-2xl font-bold mb-4">Fejlődés</Text>
+        <Text
+          className="text-slate-500 font-semibold mb-0.5"
+          style={{ fontSize: 12, letterSpacing: 1.2, textTransform: 'uppercase' }}
+        >
+          Időszak
+        </Text>
+        <Text className="text-white font-bold mb-4" style={{ fontSize: 26, letterSpacing: -0.5 }}>
+          Fejlődés
+        </Text>
 
         <PeriodSelector value={period} onChange={setPeriod} />
 
@@ -178,7 +207,7 @@ export default function ProgressScreen() {
           {weightData.length < 2 ? (
             <EmptyState message="Legalább 2 mérés kell a grafikonhoz" />
           ) : (
-            <View className="bg-slate-800 rounded-2xl p-4">
+            <View className="bg-slate-800 rounded-2xl p-4" style={{ borderWidth: 1, borderColor: '#1e2a3f' }}>
               <LineChart
                 data={weightData}
                 width={CHART_WIDTH - 32}
@@ -202,7 +231,7 @@ export default function ProgressScreen() {
           {fatData.length < 2 ? (
             <EmptyState message="Legalább 2 mérés kell a grafikonhoz" />
           ) : (
-            <View className="bg-slate-800 rounded-2xl p-4">
+            <View className="bg-slate-800 rounded-2xl p-4" style={{ borderWidth: 1, borderColor: '#1e2a3f' }}>
               <LineChart
                 data={fatData}
                 width={CHART_WIDTH - 32}
@@ -230,7 +259,7 @@ export default function ProgressScreen() {
           {muscleData.length < 2 ? (
             <EmptyState message="Legalább 2 mérés kell a grafikonhoz" />
           ) : (
-            <View className="bg-slate-800 rounded-2xl p-4">
+            <View className="bg-slate-800 rounded-2xl p-4" style={{ borderWidth: 1, borderColor: '#1e2a3f' }}>
               <LineChart
                 data={muscleData}
                 width={CHART_WIDTH - 32}
@@ -258,7 +287,7 @@ export default function ProgressScreen() {
           {fmsBarData.length === 0 ? (
             <EmptyState message="Még nincs FMS felmérés ebben az időszakban" />
           ) : (
-            <View className="bg-slate-800 rounded-2xl p-4">
+            <View className="bg-slate-800 rounded-2xl p-4" style={{ borderWidth: 1, borderColor: '#1e2a3f' }}>
               <BarChart
                 data={fmsBarData}
                 width={CHART_WIDTH - 32}

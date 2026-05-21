@@ -19,48 +19,67 @@ function WorkoutCard({ workout, isNext }: { workout: Workout; isNext: boolean })
 
   return (
     <TouchableOpacity
-      className={`rounded-2xl p-4 mb-3 mx-4 ${isNext ? 'bg-orange-500' : 'bg-slate-800'}`}
+      className="bg-slate-800 rounded-2xl p-4 mb-3 mx-4"
+      style={isNext ? { borderWidth: 1, borderColor: 'rgba(249,115,22,0.35)' } : { borderWidth: 1, borderColor: '#1e2a3f' }}
       onPress={() => router.push(`/(tabs)/workouts/${workout.id}`)}
       activeOpacity={0.8}
     >
       {isNext && (
         <View className="flex-row items-center mb-2">
-          <Ionicons name="flash" size={14} color="white" />
-          <Text className="text-white text-xs font-bold ml-1 uppercase tracking-wide">
-            {todayWorkout ? 'Mai edzés' : 'Következő edzés'}
+          <View
+            className="rounded-md px-2 py-0.5 mr-2"
+            style={{ backgroundColor: '#f97316' }}
+          >
+            <Text className="text-white font-bold" style={{ fontSize: 10.5, letterSpacing: 0.8, textTransform: 'uppercase' }}>
+              {todayWorkout ? 'Ma' : 'Következő'}
+            </Text>
+          </View>
+          <Text
+            className="text-slate-400 font-semibold"
+            style={{ fontSize: 11, letterSpacing: 0.8, textTransform: 'uppercase' }}
+          >
+            Soron következő edzés
           </Text>
         </View>
       )}
       <View className="flex-row items-start justify-between">
         <View className="flex-1">
-          <Text className={`font-bold text-base ${isNext ? 'text-white' : 'text-white'}`}>
+          <Text className="font-bold text-base text-white">
             {workout.title}
           </Text>
-          <Text className={`text-xs mt-1 ${isNext ? 'text-orange-100' : 'text-slate-400'}`}>
+          <Text className="text-slate-400 text-xs mt-1">
             {format(workoutDate, 'yyyy. MMMM d.', { locale: hu })}
           </Text>
           <View className="flex-row mt-2 gap-2">
             {workout.duration > 0 && (
-              <View className={`rounded-lg px-2 py-1 ${isNext ? 'bg-orange-600' : 'bg-slate-700'}`}>
-                <Text className={`text-xs ${isNext ? 'text-orange-100' : 'text-slate-300'}`}>
+              <View
+                className="rounded-lg px-2 py-1"
+                style={{ backgroundColor: isNext ? 'rgba(249,115,22,0.14)' : '#1e293b', borderWidth: 1, borderColor: '#1e2a3f' }}
+              >
+                <Text
+                  className="text-xs"
+                  style={{ color: isNext ? '#f97316' : '#94a3b8' }}
+                >
                   {workout.duration} perc
                 </Text>
               </View>
             )}
             {Array.isArray(sections) && sections.length > 0 && (
-              <View className={`rounded-lg px-2 py-1 ${isNext ? 'bg-orange-600' : 'bg-slate-700'}`}>
-                <Text className={`text-xs ${isNext ? 'text-orange-100' : 'text-slate-300'}`}>
+              <View
+                className="rounded-lg px-2 py-1"
+                style={{ backgroundColor: isNext ? 'rgba(249,115,22,0.14)' : '#1e293b', borderWidth: 1, borderColor: '#1e2a3f' }}
+              >
+                <Text
+                  className="text-xs"
+                  style={{ color: isNext ? '#f97316' : '#94a3b8' }}
+                >
                   {sections.length} szekció
                 </Text>
               </View>
             )}
           </View>
         </View>
-        <Ionicons
-          name="chevron-forward"
-          size={20}
-          color={isNext ? 'rgba(255,255,255,0.7)' : '#475569'}
-        />
+        <Ionicons name="chevron-forward" size={20} color="#475569" />
       </View>
     </TouchableOpacity>
   );
@@ -119,8 +138,15 @@ export default function WorkoutsScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0f172a' }}>
       <View className="px-4 pt-4 pb-3">
-        <Text className="text-white text-2xl font-bold">Edzésterv</Text>
-        <Text className="text-slate-400 text-sm mt-1">Az edző által hozzárendelt edzések</Text>
+        <Text
+          className="text-slate-500 font-semibold mb-0.5"
+          style={{ fontSize: 12, letterSpacing: 1.2, textTransform: 'uppercase' }}
+        >
+          Heti terv
+        </Text>
+        <Text className="text-white text-2xl font-bold" style={{ letterSpacing: -0.5 }}>
+          Edzések
+        </Text>
       </View>
 
       {listItems.length === 0 ? (
@@ -141,7 +167,10 @@ export default function WorkoutsScreen() {
           renderItem={({ item }) => {
             if (item.type === 'header') {
               return (
-                <Text className="text-slate-400 text-xs font-semibold uppercase tracking-wider px-4 mb-2 mt-2">
+                <Text
+                  className="text-slate-500 font-bold px-4 mb-2 mt-3"
+                  style={{ fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase' }}
+                >
                   {item.label}
                 </Text>
               );
