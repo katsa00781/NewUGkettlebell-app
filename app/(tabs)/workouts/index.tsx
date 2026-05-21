@@ -23,7 +23,7 @@ function getSectionNames(sections: Json): string {
   return parseSections(sections)
     .map(s => s.name)
     .slice(0, 3)
-    .join(' / ');
+    .join(' · ');
 }
 
 function getTotalSets(sections: Json): number {
@@ -74,7 +74,7 @@ function HeroCard({ workout, onPress }: { workout: Workout; onPress: () => void 
         </View>
         {dayLabel && (
           <Text
-            className="text-slate-400 font-bold"
+            className="text-slate-300 font-bold"
             style={{ fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase' }}
           >
             {dayLabel}
@@ -138,7 +138,7 @@ function WeeklyRow({
   const badgeBg =
     status === 'completed' ? '#14532d'
     : status === 'today' ? '#f97316'
-    : '#1e293b';
+    : '#0f172a';
 
   const statusText =
     status === 'completed'

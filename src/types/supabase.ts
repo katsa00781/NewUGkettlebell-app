@@ -430,6 +430,42 @@ export interface Database {
         }
         Relationships: []
       }
+      workout_logs: {
+        Row: {
+          id: string
+          user_id: string
+          workout_id: string
+          date: string
+          started_at: string
+          finished_at: string | null
+          sections: Json
+          notes: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          workout_id: string
+          date: string
+          started_at: string
+          finished_at?: string | null
+          sections: Json
+          notes?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          workout_id?: string
+          date?: string
+          started_at?: string
+          finished_at?: string | null
+          sections?: Json
+          notes?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       kb_complexes: {
         Row: {
           id: string
@@ -555,3 +591,4 @@ export type AppointmentParticipant = Tables<'appointments_participants'>
 export type FmsAssessment = Tables<'fms_assessments'>
 export type UserWeight = Tables<'user_weights'>
 export type UserMeasurement = Tables<'user_measurements'>
+export type WorkoutLog = Tables<'workout_logs'>

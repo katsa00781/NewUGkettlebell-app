@@ -19,6 +19,12 @@ export interface WorkoutExercise {
   weight?: number;
   rest?: number;
   notes?: string;
+  // Tényleges teljesítmény – az atléta tölti ki edzés közben
+  actualSets?: number;
+  actualReps?: number | string;
+  actualWeight?: number;
+  personalNotes?: string;
+  completed?: boolean;
 }
 
 function parseSections(sections: Json): WorkoutSection[] {
@@ -51,7 +57,35 @@ export async function getWorkout(id: string): Promise<Workout & { parsedSections
     .single();
 
   if (error) throw error;
-  return { ...data, parsedSections: parseSections(data.sections) };
+
+  const sections = parseSections(data.sections);
+
+  // Collect exerciseIds that are missing a name
+  const missingIds = new Set<string>();
+  sections.forEach(s =>
+    s.exercises?.forEach(ex => {
+      if (ex.exerciseId && !ex.name) missingIds.add(ex.exerciseId);
+    })
+  );
+
+  if (missingIds.size > 0) {
+    const { data: exerciseRows } = await supabase
+      .from('exercises')
+      .select('id, name, description')
+      .in('id', [...missingIds]);
+
+    if (exerciseRows) {
+      const byId = new Map(exerciseRows.map(e => [e.id, e]));
+      sections.forEach(s => {
+        s.exercises = s.exercises?.map(ex => ({
+          ...ex,
+          name: ex.name || byId.get(ex.exerciseId)?.name || '',
+        }));
+      });
+    }
+  }
+
+  return { ...data, parsedSections: sections };
 }
 
 export async function createWorkout(workout: Omit<WorkoutInsert, 'user_id'>): Promise<Workout> {

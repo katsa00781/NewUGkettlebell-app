@@ -1,11 +1,11 @@
 # Underground KB Mobile – Backlog / Jelenlegi állapot
 
 > Frissítsd ezt a fájlt minden befejezett feladat után!
-> Dátum: 2026-05-21 (P4 kész)
+> Dátum: 2026-05-21 (P5 kész)
 
 ---
 
-## Jelenlegi állapot: P4 KÉSZ – P5 következik
+## Jelenlegi állapot: P5 KÉSZ
 
 ### ✅ Kész és működik
 
@@ -28,25 +28,21 @@
 | **P3 – Dashboard frissítés** | `app/(tabs)/dashboard.tsx` – Testkompo widget (latest weight/body_fat/muscle + 30 napos delta); Gyors műveletek javítva (`measurements/body`, `measurements/fms`); `DeltaText` komponens trend-alapú színezéssel |
 | **P3 bugfix – Testkompo adatok nem töltődtek be** | `src/types/supabase.ts` (user_weights típus javítva: bodyfat/muscle/bmi hozzáadva, notes törölve); `src/lib/measurements.ts` (user_weights-ból olvas, mezők leképezve); `src/lib/weights.ts`, `src/hooks/useProgress.ts`, `app/(tabs)/measurements/body.tsx`, `app/(tabs)/profile/progress.tsx` (notes referenciák eltávolítva) |
 | **P4 – Edzésterv nézet (csak olvasás)** | `app/(tabs)/workouts/index.tsx` – read-only lista; törlés/duplikálás eltávolítva; „Közelgő edzések" szekció (következő edzés narancs kiemelővel + „Mai edzés"/„Következő edzés" badge); „Korábbi edzések" szekció; empty state |
+| **P5 – Workout Logger** | `src/types/supabase.ts` (workout_logs típus); `src/lib/workoutLog.ts`; `src/hooks/useWorkoutLog.ts`; `src/stores/workoutLogStore.ts`; `app/(tabs)/workouts/[id].tsx` – pihenő timer (visszaszámláló banner set teljesítése után), összefoglaló modal (szett/idő stat + megjegyzés), Supabase mentés |
 
 ---
 
 ### 🔨 Folyamatban / Következő
 
-**P5 – Workout Logger** – ez a következő lépés.
+Nincs aktív fejlesztés – P5 kész. Következő lehetséges lépések:
+- Workout log history megjelenítése az edzésterv nézetben
+- Dashboard-on utolsó edzés log mutatása
 
 ---
 
 ## Backlog (prioritás szerint)
 
-### P5 – Workout Logger
-
-- [ ] `workout_logs` típus bővítése `src/types/supabase.ts`-be
-- [ ] `src/lib/workoutLog.ts` + `src/hooks/useWorkoutLog.ts`
-- [ ] `src/stores/measurementStore.ts` → átnevezni/bővíteni: `workoutLogStore.ts`
-- [ ] Aktív edzés képernyő (szett/rep/súly igazolás)
-- [ ] Pihenő timer
-- [ ] Edzés összefoglaló
+Jelenleg üres – minden tervezett phase kész.
 
 ---
 
