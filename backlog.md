@@ -1,11 +1,11 @@
 # Underground KB Mobile – Backlog / Jelenlegi állapot
 
 > Frissítsd ezt a fájlt minden befejezett feladat után!
-> Dátum: 2026-05-21 (FMS UI redesign kész)
+> Dátum: 2026-05-28 (P6 Intervallum időzítő kész)
 
 ---
 
-## Jelenlegi állapot: P5 KÉSZ
+## Jelenlegi állapot: P6 KÉSZ
 
 ### ✅ Kész és működik
 
@@ -30,14 +30,13 @@
 | **P4 – Edzésterv nézet (csak olvasás)** | `app/(tabs)/workouts/index.tsx` – read-only lista; törlés/duplikálás eltávolítva; „Közelgő edzések" szekció (következő edzés narancs kiemelővel + „Mai edzés"/„Következő edzés" badge); „Korábbi edzések" szekció; empty state |
 | **P5 – Workout Logger** | `src/types/supabase.ts` (workout_logs típus); `src/lib/workoutLog.ts`; `src/hooks/useWorkoutLog.ts`; `src/stores/workoutLogStore.ts`; `app/(tabs)/workouts/[id].tsx` – pihenő timer (visszaszámláló banner set teljesítése után), összefoglaló modal (szett/idő stat + megjegyzés), Supabase mentés |
 | **FMS UI redesign + Clearing tesztek** | `app/(tabs)/measurements/fms.tsx` – design alapján újraírva + 3 fájdalom clearing teszt (SM, TSPU, RS); `src/lib/fms.ts` – FMS_MOVEMENTS bővítve (englishLabel, description, bilateral); `src/types/supabase.ts` – sm_clearing, tspu_clearing, rs_clearing boolean mezők; Supabase migráció: `fms_clearing_tests` |
+| **P6 – Intervallum időzítő** | `src/types/supabase.ts` (IntervalTimer típus); Supabase migráció: `interval_timers` tábla + RLS; `src/lib/intervalTimers.ts` (CRUD + FACTORY_TIMERS: Tabata, HIIT 40/20, EMOM); `src/hooks/useIntervalTimers.ts`; `src/stores/intervalTimerStore.ts` (fázis state machine + tick logika); `src/components/timer/PhaseBar.tsx`, `ColorPicker.tsx`, `TimerCard.tsx`, `CircularCountdown.tsx`; `app/(tabs)/workouts/interval-timer/index.tsx` (hub), `edit.tsx` (szerkesztő), `run.tsx` (futó timer); `app/(tabs)/workouts/index.tsx` (Időzítő belépési pont) |
 
 ---
 
 ### 🔨 Folyamatban / Következő
 
-Nincs aktív fejlesztés – P5 kész. Következő lehetséges lépések:
-- Workout log history megjelenítése az edzésterv nézetben
-- Dashboard-on utolsó edzés log mutatása
+Nincs aktív fejlesztés – P6 kész.
 
 ---
 

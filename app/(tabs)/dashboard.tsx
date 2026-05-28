@@ -364,6 +364,28 @@ export default function DashboardScreen() {
                 </Text>
               </TouchableOpacity>
             </View>
+
+            <TouchableOpacity
+              className="bg-slate-800 rounded-2xl p-4 mt-3 flex-row items-center"
+              style={{ borderWidth: 1, borderColor: '#1e2a3f', minHeight: 100 }}
+              onPress={() => router.push('/(tabs)/workouts/interval-timer')}
+            >
+              <View
+                className="w-9 h-9 rounded-xl items-center justify-center mr-3"
+                style={{ backgroundColor: 'rgba(249,115,22,0.14)' }}
+              >
+                <Ionicons name="timer-outline" size={20} color="#f97316" />
+              </View>
+              <View className="flex-1">
+                <Text className="text-white font-bold" style={{ fontSize: 15, letterSpacing: -0.2 }}>
+                  Intervallum időzítő
+                </Text>
+                <Text className="text-slate-400" style={{ fontSize: 12, marginTop: 1 }}>
+                  Tabata, HIIT, EMOM és egyéni
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color="#475569" />
+            </TouchableOpacity>
           </View>
 
         </View>

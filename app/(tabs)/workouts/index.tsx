@@ -228,9 +228,29 @@ export default function WorkoutsScreen() {
             ? `Heti terv · ${completedCount} / ${sortedWorkouts.length}`
             : 'Heti terv'}
         </Text>
-        <Text className="text-white font-extrabold" style={{ fontSize: 28, letterSpacing: -0.5 }}>
-          Edzések
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Text className="text-white font-extrabold" style={{ fontSize: 28, letterSpacing: -0.5 }}>
+            Edzések
+          </Text>
+          <TouchableOpacity
+            onPress={() => router.push('/(tabs)/workouts/interval-timer')}
+            activeOpacity={0.8}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 5,
+              backgroundColor: '#1e293b',
+              borderRadius: 10,
+              paddingHorizontal: 11,
+              paddingVertical: 7,
+              borderWidth: 1,
+              borderColor: '#334155',
+            }}
+          >
+            <Ionicons name="timer-outline" size={16} color="#f97316" />
+            <Text style={{ color: '#f97316', fontSize: 12.5, fontWeight: '700' }}>Időzítő</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {sortedWorkouts.length === 0 ? (

@@ -475,6 +475,48 @@ export interface Database {
         }
         Relationships: []
       }
+      interval_timers: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          intro_sec: number
+          work_sec: number
+          rest_sec: number
+          cooldown_sec: number
+          rounds: number
+          work_color: string
+          rest_color: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          intro_sec?: number
+          work_sec: number
+          rest_sec: number
+          cooldown_sec?: number
+          rounds: number
+          work_color: string
+          rest_color: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          intro_sec?: number
+          work_sec?: number
+          rest_sec?: number
+          cooldown_sec?: number
+          rounds?: number
+          work_color?: string
+          rest_color?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       kb_complexes: {
         Row: {
           id: string
@@ -601,3 +643,4 @@ export type FmsAssessment = Tables<'fms_assessments'>
 export type UserWeight = Tables<'user_weights'>
 export type UserMeasurement = Tables<'user_measurements'>
 export type WorkoutLog = Tables<'workout_logs'>
+export type IntervalTimer = Tables<'interval_timers'>
